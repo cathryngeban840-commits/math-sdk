@@ -36,14 +36,14 @@ class GameExecutables(GameCalculations):
                 positions.extend(matching)
             if kind >= 3 and (kind, symbol) in self.config.paytable:
                 raw = self.config.paytable[(kind, symbol)] * ways
-                paid = round(raw * multiplier, 2)
+                paid = round(raw * multiplier, 1)
                 if paid:
                     wins.append({"symbol": symbol, "kind": kind, "win": paid,
                                  "positions": positions,
                                  "meta": {"ways": ways, "globalMult": multiplier,
                                           "winWithoutMult": raw, "symbolMult": 0}})
                     total += paid
-        self.win_data = {"totalWin": round(total, 2), "wins": wins}
+        self.win_data = {"totalWin": round(total, 1), "wins": wins}
         if self.win_data["totalWin"] > 0:
             Ways.record_ways_wins(self)
             self.win_manager.update_spinwin(self.win_data["totalWin"])
