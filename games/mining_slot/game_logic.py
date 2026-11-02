@@ -99,11 +99,18 @@ class FeatureState:
     multiplier_increment: float
     sticky_reels: set[int] = field(default_factory=set)
     total_feature_win: float = 0.0
+    max_spins: int = 30
+    max_multiplier: float = 5.0
 
     def add_retrigger(self, count: int):
         tier = bonus_for_scatter(count)
         if tier:
-            self.spins_remaining += tier[1]
+            self.spins_remaining = min(self.max_spins, self.spins_remaining + tier[1])
+
+    def advance_multiplier(self):
+        """Advance after a spin; the increment applies to the next free spin."""
+        self.multiplier = min(self.max_multiplier, self.multiplier + self.multiplier_increment)
+        return self.multiplier
 
 @dataclass
 class RoundState:
@@ -145,5 +152,5 @@ def play_feature_spin(state: FeatureState, board, round_state: RoundState):
     count = scatter_count(board)
     if count >= 3:
         state.add_retrigger(count)
-    state.multiplier += state.multiplier_increment
+    state.advance_multiplier()
     return result
