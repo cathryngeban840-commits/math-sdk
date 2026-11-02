@@ -70,12 +70,27 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == "/health":
             return self._send(200, {"ok": True, "engine": "stake-math-sdk", "game": "mining_slot"})
-        # Serve only the two explicitly permitted demo assets; do not expose the repository.
+        # Serve demo UI and explicitly allowlisted art files only; never expose repository paths.
         assets = {
             "/demo/": (GAME_DIR / "demo" / "index.html", "text/html; charset=utf-8"),
             "/demo/index.html": (GAME_DIR / "demo" / "index.html", "text/html; charset=utf-8"),
             "/demo/app.js": (GAME_DIR / "demo" / "app.js", "text/javascript; charset=utf-8"),
         }
+        # Symbol and bonus art are served from fixed subdirectories with a strict filename allowlist.
+        art_names = {
+            "miner.png", "cart.png", "gold.png", "purple.png", "blue.png",
+            "red.png", "green.png", "pickaxe.png", "lantern.png", "a.png",
+            "k.png", "q.png", "j.png", "10.png", "9.png", "w.png", "scatter.png",
+        }
+        bonus_names = {"gold_rush.png", "crystal_cavern.png", "deep_mine_jackpot.png"}
+        if path.startswith("/demo/assets/symbols/"):
+            name = path.rsplit("/", 1)[-1]
+            if name in art_names:
+                assets[path] = (GAME_DIR / "demo" / "assets" / "symbols" / name, "image/png")
+        elif path.startswith("/demo/assets/bonus/"):
+            name = path.rsplit("/", 1)[-1]
+            if name in bonus_names:
+                assets[path] = (GAME_DIR / "demo" / "assets" / "bonus" / name, "image/png")
         asset = assets.get(path)
         if asset is None:
             return self._send(404, {"error": "Not found"})
