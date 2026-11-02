@@ -48,26 +48,26 @@ class GameConfig(Config):
             "BR0": self.read_reels_csv(os.path.join(self.reels_path, "BR0.csv")),
             "FR0": self.read_reels_csv(os.path.join(self.reels_path, "FR0.csv")),
         }
-        # No bonus-buy mode until feature math has been optimized and independently verified.
+        # Unbiased natural-spin sample: every round uses the ordinary reel strips.
+        # Do not force scatters, free games, zero wins, or max-win outcomes during RTP measurement.
         self.bet_modes = [
             BetMode(
                 name="base", cost=1.0, rtp=self.rtp, max_win=self.wincap,
-                auto_close_disabled=False, is_feature=True, is_buybonus=False,
+                auto_close_disabled=False, is_feature=False, is_buybonus=False,
                 distributions=[
-                    Distribution(criteria="wincap", quota=0.001, win_criteria=self.wincap,
-                        conditions={"reel_weights": {self.basegame_type: {"BR0": 1}, self.freegame_type: {"FR0": 1}},
-                                    "scatter_triggers": {3: 10, 4: 12, 5: 15, 6: 15},
-                                    "force_wincap": True, "force_freegame": True}),
-                    Distribution(criteria="freegame", quota=0.10,
-                        conditions={"reel_weights": {self.basegame_type: {"BR0": 1}, self.freegame_type: {"FR0": 1}},
-                                    "scatter_triggers": {3: 10, 4: 12, 5: 15, 6: 15},
-                                    "force_wincap": False, "force_freegame": True}),
-                    Distribution(criteria="0", quota=0.40, win_criteria=0.0,
-                        conditions={"reel_weights": {self.basegame_type: {"BR0": 1}},
-                                    "force_wincap": False, "force_freegame": False}),
-                    Distribution(criteria="basegame", quota=0.499,
-                        conditions={"reel_weights": {self.basegame_type: {"BR0": 1}},
-                                    "force_wincap": False, "force_freegame": False}),
+                    Distribution(
+                        criteria="basegame", quota=1.0,
+                        conditions={
+                            "reel_weights": {
+                                self.basegame_type: {"BR0": 1},
+                                self.freegame_type: {"FR0": 1},
+                            },
+                            "force_wincap": False,
+                            "force_freegame": False,
+                        },
+                    ),
                 ],
+            )
+        ]
             )
         ]
