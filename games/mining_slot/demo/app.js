@@ -4,6 +4,12 @@ let balance=1000,wagered=0,roundWin=0,lastWin=0,featureName="",fsLeft=0,mult=1,a
 let stickyWildReels=new Set();
 const money=n=>Number(n||0).toFixed(2);
 const symbolGlyph = {MINER:"⛏️",CART:"🛒",GOLD:"🪙",PURPLE:"💎",BLUE:"🔷",RED:"🟥",GREEN:"🟩",PICKAXE:"🪓",LANTERN:"🏮",A:"A",K:"K",Q:"Q",J:"J","10":"10","9":"9",S:"S",W:"W"};
+// Art is presentation-only. SDK symbol IDs remain the source of truth.
+const symbolArt = {
+  MINER:"miner", CART:"cart", GOLD:"gold", PURPLE:"purple", BLUE:"blue",
+  RED:"red", GREEN:"green", PICKAXE:"pickaxe", LANTERN:"lantern",
+  A:"a", K:"k", Q:"q", J:"j", "10":"10", "9":"9", S:"scatter", W:"w"
+};
 function draw(board){
   if(!Array.isArray(board)||board.length!==6) throw new Error("SDK reveal did not contain six reels.");
   reelsEl.innerHTML="";
@@ -12,7 +18,15 @@ function draw(board){
     reel.forEach(item=>{
       const name=typeof item==="string"?item:item?.name;
       const sym=symbolGlyph[name]||name||"?";
-      const cell=document.createElement("div"); cell.className="cell"; cell.textContent=sym;
+      const cell=document.createElement("div"); cell.className="cell";
+      const artName=symbolArt[name];
+      if(artName){
+        const img=document.createElement("img");
+        img.className="symbol-art"; img.alt=name; img.draggable=false;
+        img.src="/demo/assets/symbols/"+artName+".png";
+        img.onerror=()=>{img.remove();cell.textContent=sym;};
+        cell.appendChild(img);
+      } else cell.textContent=sym;
       if(["MINER","CART","GOLD","PURPLE"].includes(name)) cell.classList.add("high");
       if(name==="S") cell.classList.add("scatter");
       if(name==="W") cell.classList.add("wild");
