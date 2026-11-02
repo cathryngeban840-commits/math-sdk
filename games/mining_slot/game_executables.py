@@ -7,6 +7,11 @@ class GameExecutables(GameCalculations):
         """Expand all five cells on each reel containing a Wild."""
         if not hasattr(self, "sticky_wild_reels"):
             self.sticky_wild_reels = set()
+        # Capture natural Scatters before an expanding Wild transforms its reel.
+        # Trigger eligibility is based on symbols that actually landed.
+        self._mining_scatter_count_on_board = sum(
+            1 for reel in self.board for symbol in reel if symbol.name == "S"
+        )
         current = {r for r, reel in enumerate(self.board) if any(s.name == "W" for s in reel)}
         if self.gametype == self.config.freegame_type:
             current |= self.sticky_wild_reels
@@ -51,4 +56,6 @@ class GameExecutables(GameCalculations):
         Ways.emit_wayswin_events(self)
 
     def count_scatters(self):
+        if hasattr(self, "_mining_scatter_count_on_board"):
+            return self._mining_scatter_count_on_board
         return sum(1 for reel in self.board for symbol in reel if symbol.name == "S")
