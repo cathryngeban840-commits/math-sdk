@@ -24,5 +24,17 @@ Use the SDK's 0_0_ways game as the all-ways foundation and 0_0_expwilds only as 
 
 See PORTING_STATUS.md and game_spec.json.
 
-## Browser prototype
-Open [`demo/index.html`](demo/index.html) for the playable visual prototype. It includes a 6×5 reel display, adjustable demo bet, spin and auto-spin controls, rules/paytable panel, feature-tier presentation, expanding/sticky Wild visuals, and demo balance. The browser prototype uses local randomized outcomes for UI testing; it is **not connected to the calibrated SDK math engine** and must not be used to represent the measured RTP or real-money outcomes.
+## SDK-connected local browser demo
+
+The browser client now requests each round from the Python SDK adapter; it does not generate its own symbols or calculate payouts locally.
+
+From the repository root, install the project's dependencies and start the adapter:
+
+```bash
+pip install -r requirements.txt
+python games/mining_slot/server.py
+```
+
+Then open [http://127.0.0.1:8787/demo/](http://127.0.0.1:8787/demo/). The local API exposes `GET /health`, `POST /api/spin`, and the two demo assets. The browser renders the SDK's `reveal`, feature trigger/retrigger, win, and final payout events. The displayed balance is simulated demo credit only.
+
+This is a local development adapter, not a production Remote Gaming Server (RGS), wallet, account, or Stake deployment. Python's built-in HTTP server is intended for development and is not production-hardened. Re-run SDK tests and math validation after any outcome or feature changes.
