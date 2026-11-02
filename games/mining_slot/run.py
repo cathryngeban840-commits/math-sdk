@@ -1,4 +1,6 @@
 """Native SDK unbiased RTP measurement and RGS verification for Mining Slot."""
+import json
+import os
 from gamestate import GameState
 from game_config import GameConfig
 from utils.game_analytics.run_analysis import create_stat_sheet
@@ -22,3 +24,8 @@ if __name__ == "__main__":
     generate_configs(gamestate)
     create_stat_sheet(gamestate, custom_keys=[{"symbol": "scatter"}])
     execute_all_tests(config)
+    stats_path = os.path.join(config.library_path, "stats_summary.json")
+    with open(stats_path, "r", encoding="utf-8") as report:
+        stats = json.load(report)["base"]
+    print("\\nUNBIASED RTP MEASUREMENT")
+    print(json.dumps({key: stats.get(key) for key in ("rtp", "std", "max_win", "num_events", "prob_nil")}, indent=2))
