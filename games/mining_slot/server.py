@@ -66,9 +66,29 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if urlparse(self.path).path == "/health":
+        path = urlparse(self.path).path
+        if path == "/health":
             return self._send(200, {"ok": True, "engine": "stake-math-sdk", "game": "mining_slot"})
-        self._send(404, {"error": "Not found"})
+        # Serve only the two explicitly permitted demo assets; do not expose the repository.
+        assets = {
+            "/demo/": (GAME_DIR / "demo" / "index.html", "text/html; charset=utf-8"),
+            "/demo/index.html": (GAME_DIR / "demo" / "index.html", "text/html; charset=utf-8"),
+            "/demo/app.js": (GAME_DIR / "demo" / "app.js", "text/javascript; charset=utf-8"),
+        }
+        asset = assets.get(path)
+        if asset is None:
+            return self._send(404, {"error": "Not found"})
+        file_path, content_type = asset
+        try:
+            body = file_path.read_bytes()
+        except OSError:
+            return self._send(404, {"error": "Demo asset not found"})
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
 
     def do_POST(self):
         if urlparse(self.path).path != "/api/spin":
