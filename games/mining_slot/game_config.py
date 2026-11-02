@@ -17,6 +17,8 @@ class GameConfig(Config):
         self.provider_number = 0
         self.working_name = "Mining Slot"
         self.wincap = 15000
+        self.mining_max_feature_spins = 30
+        self.mining_max_feature_multiplier = 5.0
         self.win_type = "ways"
         self.rtp = 0.96  # target only; optimizer must establish measured RTP
         self.construct_paths()
