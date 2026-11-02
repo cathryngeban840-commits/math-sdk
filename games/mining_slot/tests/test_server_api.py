@@ -1,11 +1,11 @@
 """Exercise the local HTTP adapter used by the Mining Slot browser demo."""
 import json
-from threading import Thread
-from urllib.request import Request, urlopen
-from urllib.error import HTTPError
 from http.server import ThreadingHTTPServer
+from threading import Thread
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
-import games.mining_slot.server as server_module
+import server as server_module
 
 
 def run_server():
@@ -21,11 +21,7 @@ def test_health_endpoint_reports_sdk_connection():
         with urlopen(base + "/health") as response:
             payload = json.loads(response.read())
             assert response.status == 200
-            assert payload == {
-                "ok": True,
-                "engine": "stake-math-sdk",
-                "game": "mining_slot",
-            }
+            assert payload == {"ok": True, "engine": "stake-math-sdk", "game": "mining_slot"}
     finally:
         httpd.shutdown()
         httpd.server_close()
@@ -38,8 +34,10 @@ def test_spin_endpoint_validates_bet_and_returns_sdk_outcome(monkeypatch):
         "payoutMultiplier": 2.5,
         "baseGameWins": 2.5,
         "freeGameWins": 0,
-        "events": [{"type": "reveal", "board": [[{"name": "9"}] * 7] * 6},
-                   {"type": "finalWin", "amount": 250}],
+        "events": [
+            {"type": "reveal", "board": [[{"name": "9"}] * 7] * 6},
+            {"type": "finalWin", "amount": 250},
+        ],
         "game": "mining_slot",
         "engine": "stake-math-sdk",
     }
