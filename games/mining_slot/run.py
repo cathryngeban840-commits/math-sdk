@@ -19,7 +19,7 @@ if __name__ == "__main__":
         num_threads, compression, profiling
     )
     # The verifier writes its summary into this directory.
-    os.makedirs(os.path.join(config.game_path, "library"), exist_ok=True)
+    os.makedirs(os.path.join("games", config.game_id, "library"), exist_ok=True)
     # Runs lookup precision, book/LUT payout consistency, RTP, volatility,
     # and Studio submission-limit checks without the SDK's optional XLSX report.
     execute_all_tests(config)
