@@ -83,7 +83,7 @@ def evaluate_ways(board, bet=1.0, multiplier=1.0, cap=ROUND_CAP):
                 wins.append({"symbol": symbol, "reels": length, "ways": ways,
                              "payout": amount})
                 total += amount
-    total = min(total, cap)
+    total = round(min(total, cap), 1)
     return {"totalWin": total, "wins": wins}
 
 def scatter_count(board):
