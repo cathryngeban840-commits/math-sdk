@@ -4,13 +4,14 @@ from game_executables import GameExecutables
 class GameStateOverride(GameExecutables):
     def reset_book(self):
         super().reset_book()
+        # Clear only between independent outcome attempts; this method is not called
+        # between free spins, so the feature's expanded reels remain sticky.
         self.sticky_wild_reels = set()
         self.mining_feature_multiplier = 1.0
         self.mining_feature_increment = 0.0
         self.mining_feature_name = None
 
     def assign_special_sym_function(self):
-        # Wilds are expanding symbols; they do not receive a separate multiplier.
         self.special_symbol_functions = {}
 
     def check_game_repeat(self):
