@@ -16,12 +16,25 @@ class MiningRulesTests(unittest.TestCase):
     def test_all_ways_multiplicity(self):
         b = board("MINER")
         result = evaluate_ways(b)
-        self.assertEqual(result["totalWin"], 15000.0)  # game-level max-win cap
+        self.assertEqual(result["totalWin"], 200.0)  # 6-reel total-bet award
 
     def test_rgs_payout_precision_is_tenth_of_bet(self):
         b = board("9")
         result = evaluate_ways(b, multiplier=1.25)
         self.assertAlmostEqual(result["totalWin"] * 10, round(result["totalWin"] * 10))
+
+    def test_total_bet_payout_normalization(self):
+        b = board("MINER")
+        b[3] = ["9"] * 5
+        b[4] = ["9"] * 5
+        b[5] = ["9"] * 5
+        result = evaluate_ways(b)
+        self.assertEqual(result["totalWin"], 5.0)
+
+    def test_sdk_precision_rounding_per_award(self):
+        b = board("A")
+        result = evaluate_ways(b)
+        self.assertEqual(result["totalWin"] * 10, round(result["totalWin"] * 10))
 
     def test_left_to_right_stops_at_first_empty_reel(self):
         b = board("MINER")
@@ -35,7 +48,7 @@ class MiningRulesTests(unittest.TestCase):
         self.assertEqual(reels, (0,))
         self.assertEqual(expanded[0], [WILD] * 5)
         result = evaluate_ways(expanded)
-        self.assertEqual(result["totalWin"], 15000.0)  # game-level max-win cap
+        self.assertEqual(result["totalWin"], 200.0)  # 6-reel total-bet award
 
     def test_scatter_not_substitute_or_pay(self):
         b = board("MINER")
