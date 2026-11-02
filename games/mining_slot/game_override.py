@@ -35,14 +35,14 @@ class GameStateOverride(GameExecutables):
     def update_freespin_amount(self, scatter_key="scatter"):
         """Award initial feature spins from the actual scatter count."""
         count = self._scatter_tier_count()
-        self.tot_fs = self.config.freespin_triggers[self.gametype][count]
+        self.tot_fs = min(self.config.mining_max_feature_spins, self.config.freespin_triggers[self.gametype][count])
         fs_trigger_event(self, basegame_trigger=(self.gametype == self.config.basegame_type),
                          freegame_trigger=(self.gametype != self.config.basegame_type))
 
     def update_fs_retrigger_amt(self, scatter_key="scatter"):
         """Award retriggers; 5 or more Scatters always use the top tier."""
         count = self._scatter_tier_count()
-        self.tot_fs += self.config.freespin_triggers[self.gametype][count]
+        self.tot_fs = min(self.config.mining_max_feature_spins, self.tot_fs + self.config.freespin_triggers[self.gametype][count])
         fs_trigger_event(self, freegame_trigger=True, basegame_trigger=False)
 
     def assign_special_sym_function(self):
