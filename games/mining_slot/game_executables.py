@@ -26,7 +26,7 @@ class GameExecutables(GameCalculations):
         """Left-to-right all-ways evaluation; explicitly supports an all-Wild first reel."""
         self.expand_wild_reels()
         multiplier = self.mining_feature_multiplier if self.gametype == self.config.freegame_type else 1.0
-        paying_symbols = {symbol for _, symbol in self.config.paytable}
+        paying_symbols = sorted({symbol for _, symbol in self.config.paytable})
         wins, total = [], 0.0
         for symbol in paying_symbols:
             ways, kind, positions = 1, 0, []
