@@ -57,20 +57,13 @@ def expand_wild_reels(board, sticky_reels: Iterable[int] = ()):
     return out, tuple(sorted(expanded))
 
 def evaluate_ways(board, bet=1.0, multiplier=1.0, cap=ROUND_CAP):
-    """Evaluate left-to-right all-ways wins; one payout per symbol and length.
-
-    For a target symbol, each reel contributes its count of target + Wild
-    positions. A fully Wild reel therefore contributes five ways. Scatter is
-    never substituted and is never a paying symbol.
-    """
+    """Evaluate left-to-right all-ways wins; one payout per symbol and length."""
     validate_board(board)
     if bet < 0 or multiplier < 0 or cap < 0:
         raise ValueError("bet, multiplier and cap must be non-negative.")
-    wins = []
-    total = 0.0
+    wins, total = [], 0.0
     for symbol, pays in PAYTABLE.items():
-        ways = 1
-        length = 0
+        ways, length = 1, 0
         for reel in board:
             count = sum(s == symbol or s == WILD for s in reel)
             if count == 0:
@@ -80,17 +73,18 @@ def evaluate_ways(board, bet=1.0, multiplier=1.0, cap=ROUND_CAP):
         if length >= 3:
             amount = pays[length] * ways * bet * multiplier
             if amount:
-                wins.append({"symbol": symbol, "reels": length, "ways": ways,
-                             "payout": amount})
+                wins.append({"symbol": symbol, "reels": length, "ways": ways, "payout": amount})
                 total += amount
-    total = round(min(total, cap), 1)
-    return {"totalWin": total, "wins": wins}
+    return {"totalWin": round(min(total, cap), 1), "wins": wins}
 
 def scatter_count(board):
     validate_board(board)
     return sum(s == SCATTER for reel in board for s in reel)
 
 def bonus_for_scatter(count):
+    """Three and four Scatters select their tiers; every 5+ result selects top tier."""
+    if count >= 5:
+        return BONUS_TIERS[5]
     return BONUS_TIERS.get(count)
 
 @dataclass
@@ -105,7 +99,6 @@ class FeatureState:
     def add_retrigger(self, count: int):
         tier = bonus_for_scatter(count)
         if tier:
-            # Retrigger adds the awarded spins but does not reset progression.
             self.spins_remaining += tier[1]
 
 @dataclass
@@ -140,8 +133,7 @@ def play_feature_spin(state: FeatureState, board, round_state: RoundState):
     state.spins_remaining -= 1
     expanded, reels = expand_wild_reels(board, state.sticky_reels)
     state.sticky_reels.update(reels)
-    result = evaluate_ways(expanded, round_state.bet, state.multiplier,
-                           round_state.remaining_cap())
+    result = evaluate_ways(expanded, round_state.bet, state.multiplier, round_state.remaining_cap())
     awarded = round_state.record(result["totalWin"])
     state.total_feature_win += awarded
     result["totalWin"] = awarded
@@ -149,6 +141,5 @@ def play_feature_spin(state: FeatureState, board, round_state: RoundState):
     count = scatter_count(board)
     if count >= 3:
         state.add_retrigger(count)
-    # Multiplier used above; increment is applied to the next free spin.
     state.multiplier += state.multiplier_increment
     return result
