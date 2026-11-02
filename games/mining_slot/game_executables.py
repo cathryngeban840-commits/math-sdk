@@ -4,24 +4,26 @@ from src.calculations.ways import Ways
 
 class GameExecutables(GameCalculations):
     def expand_wild_reels(self):
-        """Expand every reel containing a Wild; retain expanded reels in free spins."""
+        """Expand all five cells on each reel containing a Wild."""
         if not hasattr(self, "sticky_wild_reels"):
             self.sticky_wild_reels = set()
         current = {r for r, reel in enumerate(self.board) if any(s.name == "W" for s in reel)}
         if self.gametype == self.config.freegame_type:
-            current |= set(self.sticky_wild_reels)
+            current |= self.sticky_wild_reels
         for reel in current:
             for row in range(self.config.num_rows[reel]):
                 self.board[reel][row] = self.symbol_storage.create_symbol("W")
+        # The base trigger's expanded reels persist into the first and all later free spins.
         self.sticky_wild_reels |= current
         return current
 
     def evaluate_ways_board(self):
-        """Evaluate all left-to-right symbol ways; Scatter never substitutes."""
+        """Left-to-right all-ways evaluation; explicitly supports an all-Wild first reel."""
         self.expand_wild_reels()
         multiplier = self.mining_feature_multiplier if self.gametype == self.config.freegame_type else 1.0
+        paying_symbols = {symbol for _, symbol in self.config.paytable}
         wins, total = [], 0.0
-        for symbol in self.config.paying_symbol_names:
+        for symbol in paying_symbols:
             ways, kind, positions = 1, 0, []
             for reel_index, reel in enumerate(self.board):
                 matching = [{"reel": reel_index, "row": row}
