@@ -35,7 +35,8 @@ class GameExecutables(GameCalculations):
                 ways *= len(matching)
                 positions.extend(matching)
             if kind >= 3 and (kind, symbol) in self.config.paytable:
-                raw = self.config.paytable[(kind, symbol)] * ways
+                # Paytable values are total-bet awards at the maximum five positions per reel.
+                raw = self.config.paytable[(kind, symbol)] * ways / (5 ** kind)
                 paid = round(raw * multiplier, 1)
                 if paid:
                     wins.append({"symbol": symbol, "kind": kind, "win": paid,
