@@ -1,0 +1,26 @@
+name: Mining Slot SDK smoke test
+
+on:
+  push:
+    branches: [mining-slot-integration]
+    paths:
+      - "games/mining_slot/**"
+      - "src/**"
+      - "requirements.txt"
+      - ".github/workflows/mining-slot-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  sdk-round-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install SDK dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run Mining Slot SDK tests
+        run: python -m pytest games/mining_slot/tests -q
