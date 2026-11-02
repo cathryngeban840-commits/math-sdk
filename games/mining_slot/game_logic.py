@@ -137,7 +137,7 @@ def play_feature_spin(state: FeatureState, board, round_state: RoundState):
     state.spins_remaining -= 1
     expanded, reels = expand_wild_reels(board, state.sticky_reels)
     state.sticky_reels.update(reels)
-    result = evaluate_ways(expanded, round_state.bet, state.multiplier, round_state.remaining_cap())
+    result = evaluate_ways(expanded, round_state.bet, state.multiplier, round_state.remaining_cap() / round_state.bet if round_state.bet else 0.0)
     awarded = round_state.record(result["totalWin"])
     state.total_feature_win += awarded
     result["totalWin"] = awarded
