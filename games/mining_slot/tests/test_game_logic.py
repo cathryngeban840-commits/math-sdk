@@ -95,6 +95,23 @@ class MiningRulesTests(unittest.TestCase):
         retrigger_spins = 15
         self.assertEqual(min(30, current_spins + retrigger_spins), 30)
 
+    def test_retrigger_spin_budget_is_capped(self):
+        fs = start_feature(board("9"), 5)[0]
+        fs.spins_remaining = 25
+        fs.add_retrigger(5)
+        self.assertEqual(fs.spins_remaining, 30)
+
+    def test_multiplier_advances_after_spin_and_is_capped(self):
+        fs = start_feature(board("9"), 4)[0]
+        fs.advance_multiplier()
+        self.assertEqual(fs.multiplier, 1.25)
+        fs.multiplier = 4.9
+        fs.advance_multiplier()
+        self.assertEqual(fs.multiplier, 5.0)
+
+    def test_scatter_counts_above_five_use_top_tier(self):
+        self.assertEqual(bonus_for_scatter(30), ("Deep Mine Jackpot", 15, 0.5))
+
     def test_sticky_reels_remain_expanded(self):
         fs = start_feature(board("9"), 3)[0]
         fs.sticky_reels.add(4)
