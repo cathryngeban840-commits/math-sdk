@@ -17,9 +17,12 @@ This folder is the dedicated integration workspace for the 6×5 Mining Slot proj
 - Bonus Buy is deferred until base/feature math is calibrated and validated.
 
 ## Math status
-The 96% RTP is a target, not a measured or certified result. Paytable and reel strips remain provisional. Do not publish an RTP claim until SDK-generated outcome books, optimization, analytics, and RGS verification complete successfully.
+Latest SDK simulation (2026-11-02): measured RTP 96.24%, within the 96.00–96.70% target; 6/6 SDK risk checks passed; configured round cap is 15,000×. Reference-rule tests and SDK validation workflow passed. This is a successful development validation run, not independent certification or Stake approval. Re-run the full simulation after any math, reel-strip, or feature-rule change.
 
 ## Porting approach
 Use the SDK's 0_0_ways game as the all-ways foundation and 0_0_expwilds only as a behavioral reference. The latter is not a drop-in implementation: Mining Slot expands an entire reel and carries full expanded reels into free spins. That behavior needs a dedicated state representation and tests.
 
 See PORTING_STATUS.md and game_spec.json.
+
+## Browser prototype
+Open [`demo/index.html`](demo/index.html) for the playable visual prototype. It includes a 6×5 reel display, adjustable demo bet, spin and auto-spin controls, rules/paytable panel, feature-tier presentation, expanding/sticky Wild visuals, and demo balance. The browser prototype uses local randomized outcomes for UI testing; it is **not connected to the calibrated SDK math engine** and must not be used to represent the measured RTP or real-money outcomes.
