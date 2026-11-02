@@ -16,6 +16,8 @@ function draw(board){
       if(["MINER","CART","GOLD","PURPLE"].includes(name)) cell.classList.add("high");
       if(name==="S") cell.classList.add("scatter");
       if(name==="W") cell.classList.add("wild");
+      if(item?.winning) cell.classList.add("winning");
+      if(item?.sticky) cell.classList.add("sticky");
       col.appendChild(cell);
     });
     reelsEl.appendChild(col);
@@ -36,7 +38,7 @@ async function renderOutcome(outcome,bet){
     if(event.type==="reveal"){
       const board=event.board.map(reel=>reel.slice(1,-1));
       board.forEach((reel,index)=>{if(reel.some(item=>(typeof item==="string"?item:item?.name)==="W"))stickyWildReels.add(index)});
-      board.forEach((reel,index)=>{if(stickyWildReels.has(index))board[index]=reel.map(()=>({name:"W"}))});
+      board.forEach((reel,index)=>{if(stickyWildReels.has(index))board[index]=reel.map(()=>({name:"W",sticky:true}))});
       draw(board);
       await delay(160);
     } else if(event.type==="freeSpinTrigger"){
@@ -56,7 +58,19 @@ async function renderOutcome(outcome,bet){
         message.textContent="Free spin "+event.amount+" of "+event.total;
       }
     } else if(event.type==="winInfo"){
-      const seen=(event.wins||[]).flatMap(w=>w.meta?[Number(w.meta.globalMult||1)]:[]);
+      const wins=Array.isArray(event.wins)?event.wins:[];
+      const boardCells=[...reelsEl.querySelectorAll(".reel")].map(reel=>[...reel.querySelectorAll(".cell")]);
+      let shown=0;
+      for(const win of wins){
+        const amount=Number(win.win||0)/100;
+        shown+=amount;
+        for(const pos of (win.positions||[])){
+          const cell=boardCells[Number(pos.reel)]?.[Number(pos.row)-1];
+          if(cell) cell.classList.add("winning");
+        }
+      }
+      if(shown>0) message.textContent="WIN! "+money(shown)+"× bet across "+wins.length+" winning symbol"+(wins.length===1?"":"s");
+      const seen=wins.flatMap(w=>w.meta?[Number(w.meta.globalMult||1)]:[]);
       if(seen.length) mult=Math.max(mult,...seen);
     } else if(event.type==="updateGlobalMult"){
       mult=Number(event.globalMult||mult);
