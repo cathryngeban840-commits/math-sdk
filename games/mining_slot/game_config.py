@@ -21,6 +21,9 @@ class GameConfig(Config):
         self.mining_max_feature_multiplier = 5.0
         self.win_type = "ways"
         self.rtp = 0.96  # target only; optimizer must establish measured RTP
+        # First measured pass landed at 10.46% RTP; scale provisional awards
+        # toward target while preserving symbol/reel frequency relationships.
+        self.mining_paytable_scale = 9.18
         self.construct_paths()
         self.num_reels = 6
         self.num_rows = [5] * 6
