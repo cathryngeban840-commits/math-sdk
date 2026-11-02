@@ -8,7 +8,8 @@ class GameExecutables(GameCalculations):
         if not hasattr(self, "sticky_wild_reels"):
             self.sticky_wild_reels = set()
         current = {r for r, reel in enumerate(self.board) if any(s.name == "W" for s in reel)}
-        current |= set(self.sticky_wild_reels) if self.gametype == self.config.freegame_type else set()
+        if self.gametype == self.config.freegame_type:
+            current |= set(self.sticky_wild_reels)
         for reel in current:
             for row in range(self.config.num_rows[reel]):
                 self.board[reel][row] = self.create_symbol("W")
@@ -17,13 +18,38 @@ class GameExecutables(GameCalculations):
         return current
 
     def evaluate_ways_board(self):
+        """SDK-compatible all-ways evaluator, including fully-Wild first reels."""
         self.expand_wild_reels()
-        feature_mult = self.mining_feature_multiplier if self.gametype == self.config.freegame_type else 1.0
-        self.win_data = Ways.get_ways_data(
-            self.config, self.board,
-            global_multiplier=feature_mult,
-            multiplier_strategy="global",
-        )
+        multiplier = self.mining_feature_multiplier if self.gametype == self.config.freegame_type else 1.0
+        wins = []
+        total = 0.0
+        for symbol in self.config.paying_symbol_names:
+            ways = 1
+            kind = 0
+            positions = []
+            for reel_index, reel in enumerate(self.board):
+                matching = [
+                    {"reel": reel_index, "row": row}
+                    for row, item in enumerate(reel)
+                    if item.name == symbol or item.name == "W"
+                ]
+                if not matching:
+                    break
+                kind += 1
+                ways *= len(matching)
+                positions.extend(matching)
+            if kind >= 3 and (kind, symbol) in self.config.paytable:
+                raw = self.config.paytable[(kind, symbol)] * ways
+                paid = round(raw * multiplier, 2)
+                if paid:
+                    wins.append({
+                        "symbol": symbol, "kind": kind, "win": paid,
+                        "positions": positions,
+                        "meta": {"ways": ways, "globalMult": multiplier,
+                                 "winWithoutMult": raw, "symbolMult": 0},
+                    })
+                    total += paid
+        self.win_data = {"totalWin": round(total, 2), "wins": wins}
         if self.win_data["totalWin"] > 0:
             Ways.record_ways_wins(self)
             self.win_manager.update_spinwin(self.win_data["totalWin"])
