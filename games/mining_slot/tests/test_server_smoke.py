@@ -1,5 +1,5 @@
 """Smoke-test one real SDK-generated Mining Slot round."""
-from games.mining_slot.server import play_sdk_round
+from server import play_sdk_round
 
 
 def test_sdk_round_has_reveal_and_final_payout():
