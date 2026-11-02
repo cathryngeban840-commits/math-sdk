@@ -1,31 +1,27 @@
 # Native SDK port status
 
-**Status: integration workspace created; native game implementation and SDK validation are not yet complete.**
+**Status: initial native SDK game files and provisional reel strips have been committed. SDK execution and certification are still pending.**
 
-The fork and development branch are available. The SDK sample interfaces were inspected in:
-- games/0_0_ways/game_config.py
-- games/0_0_ways/gamestate.py
-- games/0_0_ways/game_executables.py
-- games/0_0_ways/run.py
-- games/0_0_expwilds/game_executables.py
+## Implemented in this branch
+- 6-reel × 5-row configuration and 15,625 maximum positional ways.
+- Provisional base-game and free-game reel strips (BR0 / FR0).
+- Provisional paytable mapped to the SDK's `(reel_count, symbol)` paytable convention.
+- Dedicated SDK game configuration, game-state, calculation, override, executable, and run modules.
+- Explicit left-to-right all-ways evaluator, including fully-Wild first-reel handling.
+- Full-reel Wild expansion and sticky reel tracking, including triggering-spin carry-over.
+- Three Scatter award tiers and retrigger trigger map.
+- Feature multiplier progression applied to free-spin win evaluation.
+- Independent standard-library reference rules module and unit tests.
 
-## Implementation work still required
-1. Add Mining Slot reel CSVs and a config using the SDK's exact config/distribution interfaces.
-2. Implement all-ways evaluation and win event emission.
-3. Implement full-reel expansion as a single reel-level state (not the sample's per-position expanding Wild).
-4. Carry triggering-spin expanded reels into free spins and keep them sticky through the feature.
-5. Implement the three mutually exclusive Scatter tiers, retriggers, and multiplier progression.
-6. Enforce the 15,000× cap over the entire round, including all free spins.
-7. Add deterministic feature-state tests and SDK event/schema tests.
-8. Run the SDK book generation, optimizer, analytics, and RGS verification workflow.
-
-## Acceptance gates
-- Python import and lint checks pass.
-- Unit tests cover every feature transition and cap edge case.
-- SDK book generation completes for base and feature modes.
-- Optimization converges to a documented measured RTP; 96% is not assumed.
-- Independent analytics and RGS verification pass.
-- Generated configuration and lookup assets are reviewed before release.
+## Not yet verified / remaining work
+1. Run the game inside the exact SDK environment and fix any interface/import mismatches.
+2. Confirm the SDK's scatter-entry and retrigger lifecycle against the implemented tier map.
+3. Verify the feature multiplier and sticky reel state across SDK's reset / free-spin lifecycle.
+4. Enforce and test the 15,000× cap across the *entire* bonus round, not just individual spin evaluation. The configured SDK win cap is not proof of round-wide cap semantics.
+5. Add deterministic integration tests using SDK Symbol objects and emitted event payloads.
+6. Generate outcome books, run optimizer, generate analytics, and pass RGS format verification.
+7. Optimize reel strips and paytable to a measured RTP near 96%; the current strips and paytable are provisional and unbalanced.
+8. Review volatility, bonus frequency, max-win frequency, and edge cases before considering Bonus Buy.
 
 ## Important
-No SDK build, optimizer run, RGS test, or RTP certification is claimed by this commit. SDK sample code is a reference, not proof that Mining Slot is already integrated.
+No SDK workflow, optimizer, RGS test, or RTP certification is claimed by this commit. The SDK's Python environment requires Python 3.12 or newer; the optimizer's Rust component requires Cargo. Run `python games/mining_slot/run.py` from the game directory after installing the repository's dependencies, or adapt the invocation to the SDK's launcher conventions.
