@@ -18,6 +18,11 @@ class MiningRulesTests(unittest.TestCase):
         result = evaluate_ways(b)
         self.assertEqual(result["totalWin"], 15000.0)  # game-level max-win cap
 
+    def test_rgs_payout_precision_is_tenth_of_bet(self):
+        b = board("9")
+        result = evaluate_ways(b, multiplier=1.25)
+        self.assertAlmostEqual(result["totalWin"] * 10, round(result["totalWin"] * 10))
+
     def test_left_to_right_stops_at_first_empty_reel(self):
         b = board("MINER")
         b[2] = ["9"] * 5
