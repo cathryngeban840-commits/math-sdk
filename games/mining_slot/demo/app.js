@@ -1,6 +1,7 @@
 const $ = id => document.getElementById(id);
 const reelsEl = $("reels"), message = $("message");
 let balance=1000,wagered=0,roundWin=0,lastWin=0,featureName="",fsLeft=0,mult=1,auto=false,busy=false;
+let stickyWildReels=new Set();
 const money=n=>Number(n||0).toFixed(2);
 const symbolGlyph = {MINER:"⛏️",CART:"🛒",GOLD:"🪙",PURPLE:"💎",BLUE:"🔷",RED:"🟥",GREEN:"🟩",PICKAXE:"🪓",LANTERN:"🏮",A:"A",K:"K",Q:"Q",J:"J","10":"10","9":"9",S:"S",W:"W"};
 function draw(board){
@@ -30,10 +31,12 @@ function setBusy(value){busy=value;$("spin").disabled=value;$("bet").disabled=va
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function renderOutcome(outcome,bet){
   if(!Array.isArray(outcome.events)) throw new Error("SDK response is missing its event sequence.");
-  roundWin=0; lastWin=0; featureName=""; fsLeft=0; mult=1; update();
+  roundWin=0; lastWin=0; featureName=""; fsLeft=0; mult=1; stickyWildReels=new Set(); update();
   for(const event of outcome.events){
     if(event.type==="reveal"){
       const board=event.board.map(reel=>reel.slice(1,-1));
+      board.forEach((reel,index)=>{if(reel.some(item=>(typeof item==="string"?item:item?.name)==="W"))stickyWildReels.add(index)});
+      board.forEach((reel,index)=>{if(stickyWildReels.has(index))board[index]=reel.map(()=>({name:"W"}))});
       draw(board);
       await delay(160);
     } else if(event.type==="freeSpinTrigger"){
