@@ -12,13 +12,18 @@ class GameExecutables(GameCalculations):
         for reel in current:
             for row in range(self.config.num_rows[reel]):
                 self.board[reel][row] = self.create_symbol("W")
-        if self.gametype == self.config.freegame_type:
-            self.sticky_wild_reels |= current
+        # Capture triggering-spin expansions for the first free spin.
+        self.sticky_wild_reels |= current
         return current
 
     def evaluate_ways_board(self):
         self.expand_wild_reels()
-        self.win_data = Ways.get_ways_data(self.config, self.board)
+        feature_mult = self.mining_feature_multiplier if self.gametype == self.config.freegame_type else 1.0
+        self.win_data = Ways.get_ways_data(
+            self.config, self.board,
+            global_multiplier=feature_mult,
+            multiplier_strategy="global",
+        )
         if self.win_data["totalWin"] > 0:
             Ways.record_ways_wins(self)
             self.win_manager.update_spinwin(self.win_data["totalWin"])
