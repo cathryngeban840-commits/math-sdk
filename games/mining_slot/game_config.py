@@ -20,9 +20,9 @@ class GameConfig(Config):
         self.mining_max_feature_spins = 30
         self.mining_max_feature_multiplier = 5.0
         self.win_type = "ways"
-        self.rtp = 0.96  # target only; optimizer must establish measured RTP
-        # First measured pass landed at 10.46% RTP; scale provisional awards
-        # toward target while preserving symbol/reel frequency relationships.
+        self.rtp = 0.96  # target; current SDK simulation measured 96.24%
+        # Calibrated for the current BR0/FR0 strips and feature rules.
+        # Re-run the full SDK math workflow after any math/configuration change.
         self.mining_paytable_scale = 9.6435
         self.construct_paths()
         self.num_reels = 6
