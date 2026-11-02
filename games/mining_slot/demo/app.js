@@ -47,6 +47,9 @@ async function renderOutcome(outcome,bet){
     } else if(event.type==="updateFreeSpin"){
       fsLeft=Math.max(0,Number(event.total||0)-Number(event.amount||0));
       if(featureName) message.textContent="Free spin "+event.amount+" of "+event.total;
+    } else if(event.type==="winInfo"){
+      const seen=(event.wins||[]).flatMap(w=>w.meta?[Number(w.meta.globalMult||1)]:[]);
+      if(seen.length) mult=Math.max(mult,...seen);
     } else if(event.type==="updateGlobalMult"){
       mult=Number(event.globalMult||mult);
     } else if(event.type==="finalWin"){
