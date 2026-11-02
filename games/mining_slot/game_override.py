@@ -1,5 +1,6 @@
 """Mining Slot-specific state overrides."""
 from game_executables import GameExecutables
+from src.events.events import reveal_event
 
 class GameStateOverride(GameExecutables):
     def reset_book(self):
@@ -11,11 +12,15 @@ class GameStateOverride(GameExecutables):
         self.mining_feature_increment = 0.0
         self.mining_feature_name = None
 
+    def draw_board(self, emit_event=True, trigger_symbol="scatter"):
+        """Draw natural boards without the SDK anti-scatter reroll."""
+        self.create_board_reelstrips()
+        if emit_event:
+            reveal_event(self)
+
     def check_freespin_entry(self, scatter_key="scatter"):
-        """Natural scatters trigger features in ordinary paid rounds."""
-        return len(self.special_syms_on_board.get(scatter_key, [])) >= min(
-            self.config.freespin_triggers[self.gametype].keys()
-        )
+        """Allow naturally landed scatters to start paid-round features."""
+        return self.count_scatters() >= min(self.config.freespin_triggers[self.gametype].keys())
 
     def assign_special_sym_function(self):
         self.special_symbol_functions = {}
