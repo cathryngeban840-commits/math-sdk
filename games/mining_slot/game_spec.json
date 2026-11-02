@@ -2,14 +2,71 @@
   "game_id": "mining_slot",
   "working_name": "Mining Slot",
   "status": "provisional_design",
-  "dimensions": {"reels": 6, "rows": 5, "win_type": "ways", "ways_max": 15625, "ways_start_reel": 1, "ways_direction": "left_to_right"},
-  "targets": {"rtp": 0.96, "volatility": "high", "max_win_multiplier": 15000, "rtp_status": "unvalidated"},
-  "wild": {"symbol": "W", "expansion": "any_wild_on_reel_expands_all_5_positions", "may_land_on_reel_1": true, "sticky_during_free_spins": true, "triggering_spin_expansion_carries_into_free_spins": true, "substitutes_for": "all_eligible_paying_symbols", "does_not_substitute_for": "scatter"},
-  "scatter": {"symbol": "S", "pays": false, "trigger_only": true, "tiers": [
-    {"minimum_scatter_count": 3, "maximum_scatter_count": 3, "feature": "Gold Rush", "free_spins": 10, "multiplier_start": 1.0, "multiplier_increment_per_spin": 0.0},
-    {"minimum_scatter_count": 4, "maximum_scatter_count": 4, "feature": "Crystal Cavern", "free_spins": 12, "multiplier_start": 1.0, "multiplier_increment_per_spin": 0.25},
-    {"minimum_scatter_count": 5, "maximum_scatter_count": 6, "feature": "Deep Mine Jackpot", "free_spins": 15, "multiplier_start": 1.0, "multiplier_increment_per_spin": 0.5}
-  ], "retrigger_enabled": true, "retrigger_preserves_multiplier_progression": true},
-  "round_cap": {"multiplier": 15000, "scope": "base_trigger_spin_plus_entire_feature", "resets_each_free_spin": false},
-  "bonus_buy": {"enabled": false, "status": "deferred_until_math_validation"}
+  "dimensions": {
+    "reels": 6,
+    "rows": 5,
+    "win_type": "ways",
+    "ways_max": 15625,
+    "ways_start_reel": 1,
+    "ways_direction": "left_to_right",
+    "payout_convention": "total_bet_multiplier_normalized_by_5_to_the_number_of_reels_in_the_match"
+  },
+  "targets": {
+    "rtp": 0.96,
+    "volatility": "high",
+    "max_win_multiplier": 15000,
+    "rtp_status": "unvalidated_pending_simulation"
+  },
+  "wild": {
+    "symbol": "W",
+    "expansion": "any_wild_on_reel_expands_all_5_positions",
+    "may_land_on_reel_1": true,
+    "sticky_during_free_spins": true,
+    "triggering_spin_expansion_carries_into_free_spins": true,
+    "substitutes_for": "all_eligible_paying_symbols",
+    "does_not_substitute_for": "scatter"
+  },
+  "scatter": {
+    "symbol": "S",
+    "pays": false,
+    "trigger_only": true,
+    "tiers": [
+      {
+        "minimum_scatter_count": 3,
+        "maximum_scatter_count": 3,
+        "feature": "Gold Rush",
+        "free_spins": 10,
+        "multiplier_start": 1,
+        "multiplier_increment_per_spin": 0
+      },
+      {
+        "minimum_scatter_count": 4,
+        "maximum_scatter_count": 4,
+        "feature": "Crystal Cavern",
+        "free_spins": 12,
+        "multiplier_start": 1,
+        "multiplier_increment_per_spin": 0.25
+      },
+      {
+        "minimum_scatter_count": 5,
+        "maximum_scatter_count": 30,
+        "feature": "Deep Mine Jackpot",
+        "free_spins": 15,
+        "multiplier_start": 1,
+        "multiplier_increment_per_spin": 0.5,
+        "note": "Any result of 5 or more Scatters maps to this tier on a 6x5 board."
+      }
+    ],
+    "retrigger_enabled": true,
+    "retrigger_preserves_multiplier_progression": true
+  },
+  "round_cap": {
+    "multiplier": 15000,
+    "scope": "base_trigger_spin_plus_entire_feature",
+    "resets_each_free_spin": false
+  },
+  "bonus_buy": {
+    "enabled": false,
+    "status": "deferred_until_math_validation"
+  }
 }
