@@ -1,18 +1,17 @@
-"""Mining Slot game-state integration."""
+"""Mining Slot base-game and free-spin state machine."""
 from game_override import GameStateOverride
 
 class GameState(GameStateOverride):
     def run_spin(self, sim: int, simulation_seed=None) -> None:
-        self.reset_seed(sim)
+        self.reset_seed(sim, simulation_seed)
         self.repeat = True
         while self.repeat:
             self.reset_book()
             self.draw_board(emit_event=True)
             self.evaluate_ways_board()
-            scatter_total = self.count_scatters()
-            if scatter_total >= 3 and self.check_freespin_entry():
-                # Select tier from actual scatter count. The SDK's trigger map supplies
-                # awarded spins; the multiplier progression is managed below.
+            self.win_manager.update_gametype_wins(self.gametype)
+            if self.check_fs_condition() and self.check_freespin_entry():
+                scatter_total = self.count_scatters()
                 if scatter_total == 3:
                     self.mining_feature_name, self.mining_feature_increment = "Gold Rush", 0.0
                 elif scatter_total == 4:
@@ -27,13 +26,11 @@ class GameState(GameStateOverride):
 
     def run_freespin(self) -> None:
         self.reset_fs_spin()
-        while self.fs < self.tot_fs:
+        while self.fs < self.tot_fs and not self.wincap_triggered:
             self.update_freespin()
             self.draw_board(emit_event=True)
-            # evaluate_ways_board applies the sticky expanded reels before scoring.
             self.evaluate_ways_board()
-            scatter_total = self.count_scatters()
-            if scatter_total >= 3:
+            if self.check_fs_condition():
                 self.update_fs_retrigger_amt()
             self.win_manager.update_gametype_wins(self.gametype)
             self.mining_feature_multiplier += self.mining_feature_increment
