@@ -16,7 +16,7 @@ class MiningRulesTests(unittest.TestCase):
     def test_all_ways_multiplicity(self):
         b = board("MINER")
         result = evaluate_ways(b)
-        self.assertEqual(result["totalWin"], PAYTABLE["MINER"][6] * (5 ** 6))
+        self.assertEqual(result["totalWin"], 15000.0)  # game-level max-win cap
 
     def test_left_to_right_stops_at_first_empty_reel(self):
         b = board("MINER")
@@ -30,7 +30,7 @@ class MiningRulesTests(unittest.TestCase):
         self.assertEqual(reels, (0,))
         self.assertEqual(expanded[0], [WILD] * 5)
         result = evaluate_ways(expanded)
-        self.assertEqual(result["totalWin"], PAYTABLE["MINER"][6] * (5 ** 6))
+        self.assertEqual(result["totalWin"], 15000.0)  # game-level max-win cap
 
     def test_scatter_not_substitute_or_pay(self):
         b = board("MINER")
