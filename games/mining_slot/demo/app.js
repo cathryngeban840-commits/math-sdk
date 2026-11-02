@@ -49,7 +49,12 @@ async function renderOutcome(outcome,bet){
       message.textContent="Free spins retriggered — "+fsLeft+" total spins.";
     } else if(event.type==="updateFreeSpin"){
       fsLeft=Math.max(0,Number(event.total||0)-Number(event.amount||0));
-      if(featureName) message.textContent="Free spin "+event.amount+" of "+event.total;
+      if(featureName){
+        // Derive feature progression even on dead spins with no winInfo event.
+        const increment=featureName==="CRYSTAL CAVERN" ? 0.25 : featureName==="DEEP MINE JACKPOT" ? 0.50 : 0;
+        mult=Math.min(5,1+Math.max(0,Number(event.amount||1)-1)*increment);
+        message.textContent="Free spin "+event.amount+" of "+event.total;
+      }
     } else if(event.type==="winInfo"){
       const seen=(event.wins||[]).flatMap(w=>w.meta?[Number(w.meta.globalMult||1)]:[]);
       if(seen.length) mult=Math.max(mult,...seen);
@@ -63,7 +68,12 @@ async function renderOutcome(outcome,bet){
     }
     update();
   }
-  if(!Number.isFinite(roundWin)) throw new Error("SDK returned an invalid payout.");
+  // payoutMultiplier is the SDK book's round-wide result in bet units.
+  // Prefer it over reconstructing money from the finalWin event's cent amount.
+  const sdkPayout=Number(outcome.payoutMultiplier);
+  if(!Number.isFinite(sdkPayout)||sdkPayout<0) throw new Error("SDK returned an invalid payout multiplier.");
+  roundWin=Math.round(sdkPayout*bet*100)/100;
+  lastWin=roundWin;
   balance+=roundWin; message.textContent=roundWin>0?"SDK round win: "+money(roundWin):"No win — the SDK outcome paid 0.";
   if(featureName&&fsLeft===0) message.textContent+=(roundWin>0?" ":" ")+ "Feature complete.";
   update();
