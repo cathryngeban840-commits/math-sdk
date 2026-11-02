@@ -1,0 +1,32 @@
+{
+  "grid": {
+    "reels": 6,
+    "rows": 5,
+    "positions": 30
+  },
+  "symbol_size": "512x512 RGBA PNG",
+  "symbols": {
+    "9": "symbols/9.png",
+    "10": "symbols/10.png",
+    "MINER": "symbols/miner.png",
+    "CART": "symbols/cart.png",
+    "GOLD": "symbols/gold.png",
+    "PURPLE": "symbols/purple.png",
+    "BLUE": "symbols/blue.png",
+    "RED": "symbols/red.png",
+    "GREEN": "symbols/green.png",
+    "PICKAXE": "symbols/pickaxe.png",
+    "LANTERN": "symbols/lantern.png",
+    "A": "symbols/a.png",
+    "K": "symbols/k.png",
+    "Q": "symbols/q.png",
+    "J": "symbols/j.png",
+    "W": "symbols/w.png",
+    "S": "symbols/scatter.png"
+  },
+  "bonus": {
+    "GOLD_RUSH": "bonus/gold_rush.png",
+    "CRYSTAL_CAVERN": "bonus/crystal_cavern.png",
+    "DEEP_MINE_JACKPOT": "bonus/deep_mine_jackpot.png"
+  }
+}
