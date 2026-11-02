@@ -1,7 +1,18 @@
 {
   "game_id": "mining_slot",
   "working_name": "Mining Slot",
-  "status": "provisional_design",
+  "status": "sdk_development_validated",
+  "validation": {
+    "date": "2026-11-02",
+    "measured_rtp": 0.9624,
+    "target_rtp_range": [0.96, 0.967],
+    "sample_books": 1000000,
+    "sdk_risk_checks_passed": 6,
+    "sdk_risk_checks_total": 6,
+    "verification_hashes": "passed",
+    "independent_certification": false,
+    "stake_approval": false
+  },
   "dimensions": {
     "reels": 6,
     "rows": 5,
@@ -13,9 +24,10 @@
   },
   "targets": {
     "rtp": 0.96,
+    "measured_rtp": 0.9624,
     "volatility": "high",
     "max_win_multiplier": 15000,
-    "rtp_status": "unvalidated_pending_simulation"
+    "rtp_status": "measured_in_sdk_simulation"
   },
   "wild": {
     "symbol": "W",
@@ -58,7 +70,9 @@
       }
     ],
     "retrigger_enabled": true,
-    "retrigger_preserves_multiplier_progression": true
+    "retrigger_preserves_multiplier_progression": true,
+    "feature_spin_cap": 30,
+    "feature_multiplier_cap": 5
   },
   "round_cap": {
     "multiplier": 15000,
@@ -67,6 +81,12 @@
   },
   "bonus_buy": {
     "enabled": false,
-    "status": "deferred_until_math_validation"
+    "status": "deferred_until_separate_math_validation"
+  },
+  "release_status": {
+    "local_sdk_demo": "available",
+    "production_rgs": "not_integrated",
+    "independent_certification": "not_completed",
+    "stake_approval": "not_obtained"
   }
 }
