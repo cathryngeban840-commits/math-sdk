@@ -1,0 +1,2 @@
+# Core rules and tests use only the Python standard library.
+# The parent Stake Math SDK requirements.txt governs SDK integration.
