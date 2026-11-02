@@ -71,11 +71,15 @@ def evaluate_ways(board, bet=1.0, multiplier=1.0, cap=ROUND_CAP):
             ways *= count
             length += 1
         if length >= 3:
-            amount = pays[length] * ways * bet * multiplier
+            # Match the SDK adapter: configured awards are total-bet payouts
+            # at five positions per reel, so normalize ways by 5**reels.
+            # Each individual award is rounded to the RGS tenth-bet precision.
+            amount = round((pays[length] * ways / (5 ** length)) * bet * multiplier, 1)
             if amount:
                 wins.append({"symbol": symbol, "reels": length, "ways": ways, "payout": amount})
                 total += amount
-    return {"totalWin": round(min(total, cap), 1), "wins": wins}
+    # The SDK clamps the final paid round to its configured win cap.
+    return {"totalWin": round(min(total, cap * bet), 1), "wins": wins}
 
 def scatter_count(board):
     validate_board(board)
