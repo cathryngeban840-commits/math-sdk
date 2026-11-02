@@ -34,4 +34,6 @@ class GameState(GameStateOverride):
                 self.update_fs_retrigger_amt()
             self.win_manager.update_gametype_wins(self.gametype)
             self.mining_feature_multiplier += self.mining_feature_increment
+            # evaluate_ways_board calls evaluate_wincap; the loop exits on the
+            # next condition check once the round-wide SDK win manager reaches cap.
         self.end_freespin()
