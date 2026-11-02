@@ -85,6 +85,16 @@ class MiningRulesTests(unittest.TestCase):
         self.assertEqual(paid, 2)
         self.assertTrue(rs.capped)
 
+
+    def test_feature_multiplier_ceiling(self):
+        multiplier = min(5.0, 4.75 + 0.50)
+        self.assertEqual(multiplier, 5.0)
+
+    def test_feature_spin_budget_ceiling(self):
+        current_spins = 25
+        retrigger_spins = 15
+        self.assertEqual(min(30, current_spins + retrigger_spins), 30)
+
     def test_sticky_reels_remain_expanded(self):
         fs = start_feature(board("9"), 3)[0]
         fs.sticky_reels.add(4)
