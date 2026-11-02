@@ -1,6 +1,6 @@
 """Mining Slot-specific state overrides."""
 from game_executables import GameExecutables
-from src.events.events import reveal_event
+from src.events.events import reveal_event, fs_trigger_event
 
 class GameStateOverride(GameExecutables):
     def reset_book(self):
@@ -18,9 +18,26 @@ class GameStateOverride(GameExecutables):
         if emit_event:
             reveal_event(self)
 
+    def check_fs_condition(self, scatter_key="scatter"):
+        """Use the current board for feature and retrigger scatter checks."""
+        return self.count_scatters() >= min(self.config.freespin_triggers[self.gametype].keys()) and not self.repeat
+
     def check_freespin_entry(self, scatter_key="scatter"):
         """Allow naturally landed scatters to start paid-round features."""
         return self.count_scatters() >= min(self.config.freespin_triggers[self.gametype].keys())
+
+    def update_freespin_amount(self, scatter_key="scatter"):
+        """Award initial feature spins from the actual scatter count."""
+        count = self.count_scatters()
+        self.tot_fs = self.config.freespin_triggers[self.gametype][count]
+        fs_trigger_event(self, basegame_trigger=(self.gametype == self.config.basegame_type),
+                         freegame_trigger=(self.gametype != self.config.basegame_type))
+
+    def update_fs_retrigger_amt(self, scatter_key="scatter"):
+        """Award retriggers using the current board's scatter count."""
+        count = self.count_scatters()
+        self.tot_fs += self.config.freespin_triggers[self.gametype][count]
+        fs_trigger_event(self, freegame_trigger=True, basegame_trigger=False)
 
     def assign_special_sym_function(self):
         self.special_symbol_functions = {}
