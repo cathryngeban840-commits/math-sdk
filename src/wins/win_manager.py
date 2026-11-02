@@ -51,9 +51,20 @@ class WinManager:
             raise RuntimeError("Must define a valid gametype")
 
     def update_end_round_wins(self):
-        """Accumulate total wins for a given betting round."""
-        base = min(self.max_allowed_win, self.basegame_wins)
-        free = min(self.max_allowed_win, self.freegame_wins)
+        """Accumulate wins after applying one shared cap to the entire round.
+
+        Base-game and free-game wins belong to the same paid round. Capping
+        each component independently can count up to twice the configured
+        round maximum in RTP and volatility analytics. Scale both components
+        proportionally when their combined value exceeds the round cap.
+        """
+        base = max(0.0, self.basegame_wins)
+        free = max(0.0, self.freegame_wins)
+        combined = base + free
+        if combined > self.max_allowed_win and combined > 0:
+            scale = self.max_allowed_win / combined
+            base *= scale
+            free *= scale
         self.total_cumulative_wins += base + free
         self.cumulative_base_wins += base
         self.cumulative_free_wins += free
