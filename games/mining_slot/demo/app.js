@@ -37,6 +37,29 @@ function draw(board){
     reelsEl.appendChild(col);
   });
 }
+
+const featureArt = {
+  "GOLD RUSH": {file:"gold_rush.png", tagline:"10 FREE SPINS · STEADY GOLD"},
+  "CRYSTAL CAVERN": {file:"crystal_cavern.png", tagline:"12 FREE SPINS · GROWING MULTIPLIER"},
+  "DEEP MINE JACKPOT": {file:"deep_mine_jackpot.png", tagline:"15 FREE SPINS · 0.50× MULTIPLIER STEPS"}
+};
+let introTimer;
+function showFeatureIntro(name, spins){
+  const panel=$("featureIntro"), art=featureArt[name];
+  if(!panel||!art)return;
+  $("featureIntroTitle").textContent=name;
+  $("featureIntroSubtitle").textContent=art.tagline+" · "+spins+" SPINS";
+  const img=$("featureIntroArt");
+  img.src="/demo/assets/bonus/"+art.file;
+  img.alt=name+" bonus artwork";
+  img.onerror=()=>{img.hidden=true;$("featureIntroFallback").hidden=false;};
+  img.onload=()=>{img.hidden=false;$("featureIntroFallback").hidden=true;};
+  $("featureIntroFallback").hidden=false;
+  panel.hidden=false;
+  clearTimeout(introTimer);
+  introTimer=setTimeout(()=>{panel.hidden=true;},3200);
+}
+
 function update(){
   $("balance").textContent=money(balance); $("wagered").textContent=money(wagered);
   $("roundwin").textContent=money(roundWin); $("lastwin").textContent=money(lastWin);
@@ -60,6 +83,7 @@ async function renderOutcome(outcome,bet){
       featureName=n>=15?"DEEP MINE JACKPOT":n===12?"CRYSTAL CAVERN":"GOLD RUSH";
       fsLeft=n; mult=1;
       message.textContent=featureName+" triggered — "+n+" free spins!";
+      showFeatureIntro(featureName,n);
     } else if(event.type==="freeSpinRetrigger"){
       fsLeft=Number(event.totalFs||fsLeft);
       message.textContent="Free spins retriggered — "+fsLeft+" total spins.";
