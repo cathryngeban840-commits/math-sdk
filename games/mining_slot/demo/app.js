@@ -2,6 +2,27 @@ const $ = id => document.getElementById(id);
 const reelsEl = $("reels"), message = $("message");
 let balance=1000,wagered=0,roundWin=0,lastWin=0,featureName="",fsLeft=0,mult=1,auto=false,busy=false;
 let stickyWildReels=new Set();
+let soundEnabled=true,audioContext=null;
+function playTone(frequency=440,duration=.09,type="sine",volume=.035){
+  if(!soundEnabled)return;
+  try{
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(!AudioCtx)return;
+    audioContext ||= new AudioCtx();
+    if(audioContext.state==="suspended") audioContext.resume();
+    const oscillator=audioContext.createOscillator(),gain=audioContext.createGain();
+    oscillator.type=type;oscillator.frequency.setValueAtTime(frequency,audioContext.currentTime);
+    gain.gain.setValueAtTime(volume,audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+duration);
+    oscillator.connect(gain);gain.connect(audioContext.destination);
+    oscillator.start();oscillator.stop(audioContext.currentTime+duration);
+  }catch(error){console.debug("Audio cue unavailable",error)}
+}
+function playCue(kind){
+  const cues={spin:[[180,.08,"triangle"],[240,.07,"triangle"]],stop:[[330,.07,"sine"]],win:[[523,.12,"sine"],[659,.14,"sine"],[784,.2,"sine"]],bonus:[[392,.14,"triangle"],[523,.14,"triangle"],[659,.18,"triangle"],[784,.28,"triangle"]]};
+  (cues[kind]||[]).forEach(([hz,dur,type],i)=>setTimeout(()=>playTone(hz,dur,type),i*95));
+}
+
 const money=n=>Number(n||0).toFixed(2);
 const symbolGlyph = {MINER:"⛏️",CART:"🛒",GOLD:"🪙",PURPLE:"💎",BLUE:"🔷",RED:"🟥",GREEN:"🟩",PICKAXE:"🪓",LANTERN:"🏮",A:"A",K:"K",Q:"Q",J:"J","10":"10","9":"9",S:"S",W:"W"};
 // Art is presentation-only. SDK symbol IDs remain the source of truth.
@@ -79,6 +100,7 @@ async function renderOutcome(outcome,bet){
       draw(board);
       await delay(160);
     } else if(event.type==="freeSpinTrigger"){
+      playCue("bonus");
       const n=Number(event.totalFs||0);
       featureName=n>=15?"DEEP MINE JACKPOT":n===12?"CRYSTAL CAVERN":"GOLD RUSH";
       fsLeft=n; mult=1;
@@ -113,6 +135,7 @@ async function renderOutcome(outcome,bet){
     } else if(event.type==="updateGlobalMult"){
       mult=Number(event.globalMult||mult);
     } else if(event.type==="finalWin"){
+      if(Number(event.amount||0)>0)playCue("win");
       roundWin=Number(event.amount||0)/100*bet;
       lastWin=roundWin;
     } else if(event.type==="freeSpinEnd"){
@@ -135,7 +158,7 @@ async function spin(){
   const bet=Number($("bet").value);
   if(!Number.isFinite(bet)||bet<.1||bet>1000){message.textContent="Enter a bet between 0.10 and 1,000.";return}
   if(balance<bet){message.textContent="Not enough demo balance.";stopAuto();return}
-  setBusy(true); balance-=bet; wagered+=bet; roundWin=0;lastWin=0;update();
+  setBusy(true); playCue("spin"); balance-=bet; wagered+=bet; roundWin=0;lastWin=0;update();
   try{
     const response=await fetch("/api/spin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bet})});
     const data=await response.json();
@@ -149,6 +172,8 @@ async function spin(){
 function stopAuto(){auto=false;$("auto").textContent="AUTO: OFF"}
 async function autoLoop(){while(auto){if(balance<=0){stopAuto();break}await spin();if(auto)await delay(650)}}
 $("spin").onclick=spin;
+$("sound").onclick=()=>{soundEnabled=!soundEnabled;$("sound").textContent="SOUND: "+(soundEnabled?"ON":"OFF");$("sound").setAttribute("aria-pressed",String(soundEnabled));if(soundEnabled)playTone(660,.08)};
+$("fullscreen").onclick=async()=>{try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch(e){message.textContent="Fullscreen is unavailable in this browser."}};
 $("half").onclick=()=>{$("bet").value=Math.max(.1,Number($("bet").value)/2).toFixed(2)};
 $("double").onclick=()=>{$("bet").value=Math.min(1000,Number($("bet").value)*2).toFixed(2)};
 $("rules").onclick=()=> $("help").showModal();
