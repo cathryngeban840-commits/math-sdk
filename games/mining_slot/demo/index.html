@@ -29,11 +29,27 @@ dialog{max-width:620px;width:calc(100% - 28px);background:#111c2c;color:#f4f1e8;
 .feature-card .feature-fallback{padding:38px 8px;font-size:clamp(25px,6vw,44px);font-weight:1000;letter-spacing:.08em;color:#ffe09a;text-shadow:0 3px 22px #f5a62388}
 .feature-card p{margin:10px 0 0;color:#fff0c2;font-weight:800;letter-spacing:.13em;font-size:12px}
 
+
+/* Decorative Deep Mine cabinet treatment. The reel grid remains an independent layer. */
+.reel-frame{position:relative;margin:0 auto;padding:13px 13px 11px;border:3px solid #9b6828;border-radius:20px;background:linear-gradient(145deg,#171b23 0%,#563817 9%,#171c26 17%,#080d16 83%,#6d471e 100%);box-shadow:0 0 0 2px #24170d,0 0 0 5px #d19a3e55,inset 0 0 24px #000,0 12px 34px #0009}
+.reel-frame:before,.reel-frame:after{content:"";position:absolute;top:44px;bottom:48px;width:7px;border-radius:8px;background:linear-gradient(90deg,#4a2b12,#f4c56a 45%,#6b3c12);box-shadow:0 0 12px #e9a83b66;pointer-events:none;z-index:3}
+.reel-frame:before{left:4px}.reel-frame:after{right:4px}
+.frame-top{height:42px;display:flex;align-items:center;justify-content:center;gap:18px;margin:-5px 0 8px;color:#ffe09a;font-weight:1000;letter-spacing:.24em;text-shadow:0 0 12px #e7a63e}
+.frame-title{font-size:clamp(13px,2vw,18px)}
+.frame-gem{width:11px;height:11px;transform:rotate(45deg);background:linear-gradient(135deg,#fff1ae,#e6a32d 55%,#713b0c);border:1px solid #ffe5a0;box-shadow:0 0 12px #ffbd48}
+.frame-bottom{display:flex;align-items:center;justify-content:center;gap:20px;height:26px;margin-top:8px;color:#efbd5c;text-shadow:0 0 10px #d98d26;font-size:12px}
+.frame-bottom-label{font-size:10px;font-weight:900;letter-spacing:.25em}
+.reel-frame .reels{position:relative;z-index:1}
+@media(max-width:650px){.reel-frame{padding:8px 8px 6px;border-width:2px;border-radius:13px}.frame-top{height:27px;margin:0 0 5px}.frame-bottom{height:19px;margin-top:5px}.frame-bottom-label{font-size:8px}.reel-frame:before,.reel-frame:after{top:32px;bottom:33px;width:4px}}
 </style></head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">A six-reel mining adventure</div><div class="brand">DEEP MINE</div></div><div class="pills"><span class="pill">6 REELS × 5 ROWS</span><span class="pill">15,625 WAYS</span><span class="pill">HIGH VOLATILITY</span></div></header>
 <section class="machine"><div class="mast"><h1>STRIKE IT RICH</h1><p>DISCOVER THE TREASURES BENEATH</p></div>
+<div class="reel-frame" aria-label="Deep Mine reel cabinet">
+<div class="frame-top" aria-hidden="true"><span class="frame-gem"></span><span class="frame-title">DEEP MINE</span><span class="frame-gem"></span></div>
 <div class="reels" id="reels" aria-label="Slot reels"></div>
+<div class="frame-bottom" aria-hidden="true"><span>✦</span><span class="frame-bottom-label">STRIKE IT RICH</span><span>✦</span></div>
+</div>
 <div class="status"><span>FEATURE <strong id="feature">BASE GAME</strong></span><span>SPINS <strong id="spins">—</strong></span><span>MULTIPLIER <strong id="mult">1.00×</strong></span><span>LAST WIN <strong id="lastwin">0.00</strong></span></div>
 <div class="controls"><div class="betbox"><div><label for="bet">Bet amount</label><br><input id="bet" type="number" min=".10" max="1000" step=".10" value="1.00"></div><button class="secondary" id="half">½</button><button class="secondary" id="double">2×</button></div><button class="spin" id="spin">SPIN</button><div class="right"><button class="secondary" id="rules">RULES & PAYTABLE</button><button class="secondary" id="auto">AUTO: OFF</button></div></div>
 <div class="message" id="message" role="status">Ready to descend? Spin to begin.</div>
